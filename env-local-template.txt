@@ -1,0 +1,58 @@
+# Copy this content to create your .env.local file
+# File: .env.local (create this file in your project root)
+
+# Environment Variables for "Do You Remember?" Platform
+# Development Configuration
+
+# =================
+# DATABASE CONFIGURATION
+# =================
+
+# Option 1: Local MongoDB (Recommended for development)
+# Make sure MongoDB is running locally: brew services start mongodb/brew/mongodb-community
+MONGODB_URI=mongodb://localhost:27017/time-capsule-social
+
+# Option 2: MongoDB Atlas (Cloud) - Uncomment and replace with your connection string
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/time-capsule-social?retryWrites=true&w=majority
+
+# =================
+# AUTHENTICATION SECRETS
+# =================
+
+# JWT Secret for signing tokens (Change this to a random secure string)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-dev-key-2024
+
+# NextAuth Secret (Required for NextAuth.js - Change this to a random secure string)
+NEXTAUTH_SECRET=your-nextauth-secret-key-for-development-2024
+
+# =================
+# APPLICATION CONFIGURATION
+# =================
+
+# Application URL (Keep as localhost for development)
+NEXTAUTH_URL=http://localhost:3000
+
+# Environment (automatically set to development)
+NODE_ENV=development
+
+# =================
+# TESTING CONFIGURATION (Optional)
+# =================
+
+# Test Database (Separate database for testing)
+# MONGODB_TEST_URI=mongodb://localhost:27017/time-capsule-social-test
+
+# =================
+# OPTIONAL FEATURES
+# =================
+
+# Upload configuration (if you plan to add file uploads)
+# UPLOAD_DIR=public/uploads
+# MAX_FILE_SIZE=5242880
+
+# Email configuration (if you plan to add email features)
+# EMAIL_FROM=noreply@timecapsule.com
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=your-email@gmail.com
+# SMTP_PASS=your-app-password
