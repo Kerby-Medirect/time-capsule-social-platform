@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-
+import User from '@/models/User';
 import { verifyToken, extractTokenFromHeaders } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -28,24 +28,28 @@ export async function GET(request: NextRequest) {
       ];
     }
     
+    // Get posts without population first
     const posts = await Post.find(query)
-      .populate('author', 'username avatar')
-      .populate({
-        path: 'comments',
-        populate: {
-          path: 'author',
-          select: 'username avatar'
-        }
-      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+
+    // Manually populate authors to avoid mongoose issues
+    const populatedPosts = await Promise.all(
+      posts.map(async (post) => {
+        const author = await User.findById(post.author).select('username avatar');
+        return {
+          ...post.toObject(),
+          author: author || { username: 'Unknown', avatar: '' }
+        };
+      })
+    );
 
     const totalPosts = await Post.countDocuments(query);
     const totalPages = Math.ceil(totalPosts / limit);
 
     return NextResponse.json({
-      posts,
+      posts: populatedPosts,
       pagination: {
         currentPage: page,
         totalPages,
