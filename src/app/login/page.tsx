@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             Do You Remember?
           </h1>
-          <p className="text-gray-600">Welcome back to your nostalgic journey</p>
+          <p className="text-gray-600">Welcome Back to Your Nostalgic Journey</p>
         </div>
 
         {/* Form */}
