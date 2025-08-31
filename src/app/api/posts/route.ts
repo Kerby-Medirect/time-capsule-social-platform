@@ -28,20 +28,28 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    // Get posts without population first
+    // Get posts without population first to avoid MissingSchemaError
     const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Manually populate authors to avoid mongoose issues
+    // Manually populate authors to avoid mongoose schema registration issues
     const populatedPosts = await Promise.all(
       posts.map(async (post) => {
-        const author = await User.findById(post.author).select('username avatar');
-        return {
-          ...post.toObject(),
-          author: author || { username: 'Unknown', avatar: '' }
-        };
+        try {
+          const author = await User.findById(post.author).select('username avatar');
+          return {
+            ...post.toObject(),
+            author: author || { username: 'Unknown', avatar: '' }
+          };
+        } catch (authorError) {
+          // Fallback if author lookup fails
+          return {
+            ...post.toObject(),
+            author: { username: 'Unknown', avatar: '' }
+          };
+        }
       })
     );
 
@@ -59,9 +67,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: unknown) {
-    console.error('Get posts error:', error);
+    console.error('API Posts Error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch posts' },
       { status: 500 }
     );
   }
@@ -103,12 +111,16 @@ export async function POST(request: NextRequest) {
 
     await post.save();
     
-    // Populate author info
-    await post.populate('author', 'username avatar');
+    // Manually populate author info to avoid mongoose issues
+    const author = await User.findById(decoded.userId).select('username avatar');
+    const populatedPost = {
+      ...post.toObject(),
+      author: author || { username: 'Unknown', avatar: '' }
+    };
 
     return NextResponse.json({
       message: 'Post created successfully',
-      post
+      post: populatedPost
     }, { status: 201 });
 
   } catch (error: unknown) {
