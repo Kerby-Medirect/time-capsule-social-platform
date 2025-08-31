@@ -1,0 +1,16 @@
+# Production Environment Variables for "Do You Remember?" Platform
+# Copy these values to your deployment platform's environment variables section
+
+# Database Configuration
+# Replace with your MongoDB Atlas connection string
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/time-capsule-social?retryWrites=true&w=majority
+
+# Authentication Secrets (KEEP THESE SECURE!)
+JWT_SECRET=aa0ac9109eca8045584876b2269e6d05b1c1f86f6785f59ff0cd08a109e11b3e
+NEXTAUTH_SECRET=f7a97b6d21a9d05bbea116207cdc4caad295b71d062f3163d9bb3c8f281170f5
+
+# Application URL (Replace with your actual domain)
+NEXTAUTH_URL=https://your-domain.vercel.app
+
+# Optional: For development/staging environments
+# NODE_ENV=production
