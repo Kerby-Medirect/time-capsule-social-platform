@@ -105,7 +105,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
           <div>
             <h3 className="font-semibold text-gray-900">{post.author?.username || 'Anonymous'}</h3>
             <p className="text-sm text-gray-500">
-              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+              {post.createdAt && !isNaN(new Date(post.createdAt).getTime()) 
+                ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+                : 'recently'}
             </p>
           </div>
         </div>
@@ -217,7 +219,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
                       <p className="text-sm text-gray-700">{comment.content}</p>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                      {comment.createdAt && !isNaN(new Date(comment.createdAt).getTime()) 
+                        ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })
+                        : 'recently'}
                     </p>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import User from '@/models/User';
+import Comment from '@/models/Comment';
 import { verifyToken, extractTokenFromHeaders } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -34,20 +35,45 @@ export async function GET(request: NextRequest) {
       .skip(skip)
       .limit(limit);
 
-    // Manually populate authors to avoid mongoose schema registration issues
+    // Manually populate authors and comments to avoid mongoose schema registration issues
     const populatedPosts = await Promise.all(
       posts.map(async (post) => {
         try {
+          // Get author data
           const author = await User.findById(post.author).select('username avatar');
+          
+          // Get comments with their authors
+          const comments = await Promise.all(
+            (post.comments || []).map(async (commentId) => {
+              try {
+                const comment = await Comment.findById(commentId);
+                if (!comment) return null;
+                
+                const commentAuthor = await User.findById(comment.author).select('username avatar');
+                return {
+                  ...comment.toObject(),
+                  author: commentAuthor || { username: 'Anonymous', avatar: '' }
+                };
+              } catch (err) {
+                return null;
+              }
+            })
+          );
+          
+          // Filter out null comments and limit to recent comments for performance
+          const validComments = comments.filter(c => c !== null).slice(0, 10);
+          
           return {
             ...post.toObject(),
-            author: author || { username: 'Unknown', avatar: '' }
+            author: author || { username: 'Unknown', avatar: '' },
+            comments: validComments
           };
         } catch (authorError) {
           // Fallback if author lookup fails
           return {
             ...post.toObject(),
-            author: { username: 'Unknown', avatar: '' }
+            author: { username: 'Unknown', avatar: '' },
+            comments: []
           };
         }
       })
