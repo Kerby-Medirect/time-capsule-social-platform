@@ -98,12 +98,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
           <img
-            src={post.author.avatar}
-            alt={post.author.username}
+            src={post.author?.avatar || '/default-avatar.svg'}
+            alt={post.author?.username || 'Anonymous'}
             className="w-10 h-10 rounded-full object-cover"
           />
           <div>
-            <h3 className="font-semibold text-gray-900">{post.author.username}</h3>
+            <h3 className="font-semibold text-gray-900">{post.author?.username || 'Anonymous'}</h3>
             <p className="text-sm text-gray-500">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
             </p>
@@ -205,14 +205,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
               {comments.slice(0, 3).map((comment) => (
                 <div key={comment._id} className="flex space-x-3">
                   <img
-                    src={comment.author.avatar}
-                    alt={comment.author.username}
+                    src={comment.author?.avatar || '/default-avatar.svg'}
+                    alt={comment.author?.username || 'Anonymous'}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div className="flex-1">
                     <div className="bg-gray-50 rounded-lg px-3 py-2">
                       <p className="font-medium text-sm text-gray-900">
-                        {comment.author.username}
+                        {comment.author?.username || 'Anonymous'}
                       </p>
                       <p className="text-sm text-gray-700">{comment.content}</p>
                     </div>
