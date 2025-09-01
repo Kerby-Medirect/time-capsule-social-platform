@@ -46,7 +46,6 @@ const Feed: React.FC<FeedProps> = ({ searchQuery, selectedTag, selectedDecade })
 
   const fetchPosts = useCallback(async (pageNum: number = 1, reset: boolean = false) => {
     try {
-      console.log('🔄 Feed: Starting fetch posts request...');
       if (pageNum === 1) setLoading(true);
       else setLoadingMore(true);
 
@@ -59,31 +58,25 @@ const Feed: React.FC<FeedProps> = ({ searchQuery, selectedTag, selectedDecade })
       if (selectedTag) params.append('tag', selectedTag);
       if (selectedDecade) params.append('decade', selectedDecade);
 
-      const url = `/api/posts?${params}`;
-      console.log('📡 Feed: Fetching from URL:', url);
+      const response = await fetch(`/api/posts?${params}`);
       
-      const response = await fetch(url);
-      console.log('📊 Feed: Response status:', response.status, response.statusText);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
       
       const data = await response.json();
-      console.log('📋 Feed: Response data:', data);
 
-      if (response.ok) {
-        console.log('✅ Feed: Successfully fetched', data.posts?.length, 'posts');
-        if (reset || pageNum === 1) {
-          setPosts(data.posts);
-        } else {
-          setPosts(prev => [...prev, ...data.posts]);
-        }
-        setHasMore(data.pagination.hasMore);
-        setError(null);
+      if (reset || pageNum === 1) {
+        setPosts(data.posts || []);
       } else {
-        console.error('❌ Feed: API Error:', data.error);
-        setError(data.error || 'Failed to fetch posts');
+        setPosts(prev => [...prev, ...(data.posts || [])]);
       }
+      setHasMore(data.pagination?.hasMore || false);
+      setError(null);
     } catch (err) {
-      console.error('💥 Feed: Network/Fetch Error:', err);
-      setError('Network error. Please try again.');
+      console.error('Fetch posts error:', err);
+      setError('Failed to fetch posts. Please try again.');
     } finally {
       setLoading(false);
       setLoadingMore(false);
